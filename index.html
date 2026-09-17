@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HOS-CARE | ระบบซักประวัติผู้ป่วย</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:#eef3f8;color:#172033}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+:root{--blue:#1264d6;--dark:#12304f;--line:#dce4ee;--soft:#f6f9fc;--red:#d9363e;--green:#138a59}
+header{height:68px;background:linear-gradient(110deg,#0d3f78,#1674dd);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 12px #0002}
+.brand{display:flex;gap:12px;align-items:center}.brand .logo{width:42px;height:42px;border-radius:11px;background:#fff;color:#1264d6;display:grid;place-items:center;font-size:23px;font-weight:900}.brand b{font-size:20px}.brand small{display:block;opacity:.8}
+.top{display:flex;align-items:center;gap:15px}.saveState{font-size:12px;opacity:.9}.clock{font-size:13px}
+.layout{display:flex;min-height:calc(100vh - 68px)}
+aside{width:260px;background:#fff;border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:calc(100vh - 68px);overflow:auto}
+.navtitle{font-size:11px;color:#8190a4;font-weight:800;margin:12px 10px 7px;text-transform:uppercase}
+.nav{width:100%;border:0;background:transparent;text-align:left;padding:12px;border-radius:10px;margin:2px 0;color:#43546a;display:flex;gap:11px;align-items:center}
+.nav:hover{background:#f0f5fb}.nav.active{background:#e7f0ff;color:#075bc6;font-weight:800}
+.content{flex:1;padding:22px;max-width:1500px;margin:auto;width:100%}
+.page{display:none}.page.active{display:block}
+.title{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:18px}.title h1{font-size:24px;margin:0}.title p{margin:5px 0 0;color:#6d7d91;font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;padding:10px 15px;border-radius:9px;color:#26384d;font-weight:700}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.green{background:var(--green);border-color:var(--green);color:#fff}.btn.red{background:#fff0f0;border-color:#ffd1d1;color:#b32129}.btn:active{transform:translateY(1px)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:17px;box-shadow:0 2px 8px #183b5d08}.metric{font-size:28px;font-weight:850;margin-top:7px}.muted{color:#738196;font-size:13px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px #183b5d08}.panel h3{margin:0 0 14px;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.col-12{grid-column:span 12}.col-9{grid-column:span 9}.col-8{grid-column:span 8}.col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-3{grid-column:span 3}
+label{font-size:12px;font-weight:750;color:#506076;display:block;margin:0 0 6px}input,select,textarea{width:100%;border:1px solid #ccd7e4;border-radius:8px;padding:10px 11px;background:#fff;color:#18263a;outline:none}input:focus,select:focus,textarea:focus{border-color:#4d91ed;box-shadow:0 0 0 3px #1976d21a}textarea{min-height:90px;resize:vertical}
+.req{color:#d32f2f}.hint{font-size:11px;color:#8290a2;margin-top:4px}
+.checks{display:flex;gap:8px;flex-wrap:wrap}.check{border:1px solid var(--line);padding:8px 10px;border-radius:8px;background:#fafcff}.check input{width:auto;margin-right:5px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{background:#f4f7fb;color:#526174;font-size:12px}tr:last-child td{border-bottom:0}.status{padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800;background:#eaf7f0;color:#13734c}.status.warn{background:#fff4dc;color:#9a6500}
+.patientHero{display:flex;gap:18px;align-items:center}.avatar{width:75px;height:75px;border-radius:50%;background:#e7f0ff;color:#1768cf;display:grid;place-items:center;font-size:29px;font-weight:900}.patientMeta h2{margin:0 0 5px}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{padding:4px 8px;border-radius:6px;background:#edf3fa;color:#526174;font-size:11px;font-weight:700}
+.steps{display:flex;gap:6px;margin-bottom:16px;overflow:auto}.step{min-width:120px;padding:9px 12px;background:#fff;border:1px solid var(--line);border-radius:8px;font-size:12px;color:#68778a}.step.active{background:#e7f0ff;border-color:#9bc3f7;color:#075bc6;font-weight:800}.step.done{color:#14794f}
+.alert{padding:11px 13px;border-radius:9px;background:#fff6df;border:1px solid #f5d890;color:#785500;font-size:13px;margin-bottom:12px}.danger{background:#fff0f0;border-color:#ffd0d0;color:#9e232a}.success{background:#eaf8f1;border-color:#bde8d1;color:#146b49}
+.tagInput{display:flex;gap:7px}.tagInput input{flex:1}.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.tag{background:#edf4ff;border:1px solid #cce0ff;color:#125db9;border-radius:20px;padding:5px 9px;font-size:12px}.tag button{border:0;background:transparent;color:inherit;margin-left:4px}
+.search{position:relative}.search input{padding-left:36px}.search span{position:absolute;left:12px;top:9px}
+.modal{position:fixed;inset:0;background:#10233c80;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.modalbox{background:#fff;width:min(680px,100%);max-height:90vh;overflow:auto;border-radius:15px;padding:20px;box-shadow:0 20px 70px #0004}.modalhead{display:flex;justify-content:space-between;align-items:center}.x{border:0;background:#f0f3f7;border-radius:50%;width:34px;height:34px}
+.login{position:fixed;inset:0;background:linear-gradient(135deg,#082e59,#1264d6);display:flex;align-items:center;justify-content:center;z-index:50}.loginbox{width:min(430px,92%);background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 80px #0005}.loginlogo{width:65px;height:65px;border-radius:18px;background:#e9f2ff;color:#1264d6;display:grid;place-items:center;font-size:34px;font-weight:900;margin:auto auto 14px}.login h1{text-align:center;margin:0}.login p{text-align:center;color:#718096;font-size:13px}.login .field{margin-top:14px}
+.printOnly{display:none}
+@media(max-width:900px){aside{width:75px;padding:12px 7px}.nav span:not(.ico),.navtitle,.brand small{display:none}.nav{justify-content:center}.brand b{display:none}.cards{grid-template-columns:repeat(2,1fr)}.col-8,.col-9,.col-6,.col-4,.col-3{grid-column:span 12}}
+@media(max-width:600px){header{padding:0 12px}.content{padding:12px}.cards{grid-template-columns:1fr}.top .clock{display:none}.title{align-items:flex-start;flex-direction:column}}
+@media print{header,aside,.noPrint,.actions{display:none!important}.layout{display:block}.content{padding:0}.page{display:none!important}.page.active{display:block!important}.printOnly{display:block}.panel{box-shadow:none}}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+  <div class="loginbox">
+    <div class="loginlogo">✚</div>
+    <h1>HOS-CARE</h1>
+    <p>ระบบซักประวัติและบันทึกข้อมูลผู้ป่วยจำลอง</p>
+    <div class="field"><label>รหัสผู้ใช้งาน</label><input id="loginUser" value="staff"></div>
+    <div class="field"><label>รหัสผ่าน</label><input id="loginPass" type="password" value="1234"></div>
+    <button class="btn primary" style="width:100%;margin-top:18px" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="hint" style="text-align:center;margin-top:10px">เดโม: ใช้ staff / 1234 หรือ demo / 1234</div>
+  </div>
+</div>
+
+<header>
+  <div class="brand"><div class="logo">✚</div><div><b>HOS-CARE</b><small>Patient History Management</small></div></div>
+  <div class="top"><span class="saveState" id="saveState">● พร้อมใช้งาน</span><span class="clock" id="clock"></span></div>
+</header>
+
+<div class="layout">
+<aside>
+  <div class="navtitle">เมนูหลัก</div>
+  <button class="nav active" data-page="dashboard"><span class="ico">▦</span><span>ภาพรวม</span></button>
+  <button class="nav" data-page="patients"><span class="ico">👥</span><span>ผู้ป่วย</span></button>
+  <button class="nav" data-page="history"><span class="ico">📝</span><span>ซักประวัติ</span></button>
+  <button class="nav" data-page="exam"><span class="ico">🩺</span><span>ตรวจร่างกาย</span></button>
+  <button class="nav" data-page="assessment"><span class="ico">📋</span><span>ประเมินเบื้องต้น</span></button>
+  <button class="nav" data-page="summary"><span class="ico">📄</span><span>สรุปเวชระเบียน</span></button>
+  <div class="navtitle">ระบบ</div>
+  <button class="nav" data-page="settings"><span class="ico">⚙</span><span>ตั้งค่า</span></button>
+  <button class="nav" onclick="logout()"><span class="ico">↪</span><span>ออกจากระบบ</span></button>
+</aside>
+
+<main class="content">
+
+<section class="page active" id="dashboard">
+  <div class="title"><div><h1>ภาพรวมระบบ</h1><p>ศูนย์จัดการข้อมูลการซักประวัติผู้ป่วย</p></div><div class="actions"><button class="btn primary" onclick="newPatient()">＋ ผู้ป่วยใหม่</button></div></div>
+  <div class="cards">
+    <div class="card"><div class="muted">ผู้ป่วยในเครื่อง</div><div class="metric" id="mPatients">0</div></div>
+    <div class="card"><div class="muted">บันทึกวันนี้</div><div class="metric" id="mToday">0</div></div>
+    <div class="card"><div class="muted">เคสซักประวัติ</div><div class="metric" id="mHistory">0</div></div>
+    <div class="card"><div class="muted">สถานะระบบ</div><div class="metric" style="font-size:18px;color:#138a59">พร้อมใช้งาน</div></div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>ผู้ป่วยล่าสุด</h3>
+    <div class="tablewrap"><table><thead><tr><th>HN</th><th>ชื่อผู้ป่วย</th><th>อายุ</th><th>อาการสำคัญ</th><th>สถานะ</th><th></th></tr></thead><tbody id="recent"></tbody></table></div>
+  </div>
+  <div class="alert">ข้อมูลทั้งหมดในเว็บนี้เป็นข้อมูลจำลองและจัดเก็บในเบราว์เซอร์เครื่องนี้เท่านั้น ไม่ใช่ระบบเวชระเบียนของโรงพยาบาลจริง</div>
+</section>
+
+<section class="page" id="patients">
+  <div class="title"><div><h1>ทะเบียนผู้ป่วย</h1><p>ค้นหา เปิดดู และสร้างข้อมูลผู้ป่วย</p></div><button class="btn primary" onclick="newPatient()">＋ เพิ่มผู้ป่วย</button></div>
+  <div class="panel">
+    <div class="grid"><div class="col-8 search"><span>🔎</span><input id="patientSearch" placeholder="ค้นหา HN, ชื่อ, เลขบัตรประชาชน..." oninput="renderPatients()"></div><div class="col-4"><select id="patientFilter" onchange="renderPatients()"><option value="all">ผู้ป่วยทั้งหมด</option><option value="today">สร้างวันนี้</option></select></div></div>
+  </div>
+  <div class="panel"><div class="tablewrap"><table><thead><tr><th>HN</th><th>ชื่อ-นามสกุล</th><th>เพศ</th><th>อายุ</th><th>โรคประจำตัว</th><th>แก้ไขล่าสุด</th><th></th></tr></thead><tbody id="patientTable"></tbody></table></div></div>
+</section>
+
+<section class="page" id="history">
+  <div class="title"><div><h1>ซักประวัติผู้ป่วย</h1><p>กรอกข้อมูลอย่างเป็นระบบตามลำดับ</p></div><div class="actions"><button class="btn" onclick="selectPatient()">เปลี่ยนผู้ป่วย</button><button class="btn green" onclick="saveAll()">บันทึกข้อมูล</button></div></div>
+  <div class="panel patientHero" id="currentHero"></div>
+  <div class="steps">
+    <div class="step active" data-hstep="1">1 ข้อมูลทั่วไป</div><div class="step" data-hstep="2">2 อาการสำคัญ</div><div class="step" data-hstep="3">3 ประวัติอดีต</div><div class="step" data-hstep="4">4 พฤติกรรม</div><div class="step" data-hstep="5">5 ทบทวนระบบ</div>
+  </div>
+
+  <div class="historyStep" id="hs1">
+    <div class="panel"><h3>ข้อมูลผู้ป่วย</h3><div class="grid">
+      <div class="col-3"><label>HN</label><input id="f_hn" readonly></div><div class="col-3"><label>คำนำหน้า</label><select id="f_title"><option>นาย</option><option>นาง</option><option>นางสาว</option><option>เด็กชาย</option><option>เด็กหญิง</option></select></div>
+      <div class="col-6"><label>ชื่อ-นามสกุล <span class="req">*</span></label><input id="f_name"></div>
+      <div class="col-3"><label>เลขบัตรประชาชน</label><input id="f_cid" inputmode="numeric" maxlength="13"></div><div class="col-3"><label>วันเกิด</label><input id="f_dob" type="date" onchange="calcAge()"></div><div class="col-2"><label>อายุ</label><input id="f_age" type="number"></div><div class="col-2"><label>เพศ</label><select id="f_gender"><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select></div><div class="col-2"><label>กรุ๊ปเลือด</label><select id="f_blood"><option>ไม่ทราบ</option><option>A</option><option>B</option><option>AB</option><option>O</option></select></div>
+      <div class="col-4"><label>เบอร์โทรศัพท์</label><input id="f_phone"></div><div class="col-4"><label>อาชีพ</label><input id="f_job"></div><div class="col-4"><label>ผู้ติดต่อฉุกเฉิน</label><input id="f_emergency"></div>
+      <div class="col-12"><label>ที่อยู่</label><textarea id="f_address"></textarea></div>
+    </div></div>
+  </div>
+
+  <div class="historyStep" id="hs2" style="display:none">
+    <div class="panel"><h3>อาการสำคัญ (Chief Complaint)</h3><div class="grid">
+      <div class="col-8"><label>อาการที่มาพบแพทย์ <span class="req">*</span></label><input id="f_cc" placeholder="เช่น ไข้ ไอ เจ็บคอ มา 2 วัน"></div><div class="col-4"><label>ระยะเวลา</label><input id="f_duration" placeholder="เช่น 2 วัน"></div>
+      <div class="col-12"><label>ประวัติการเจ็บป่วยปัจจุบัน</label><textarea id="f_hpi" placeholder="เริ่มมีอาการเมื่อใด อาการเป็นอย่างไร อะไรทำให้อาการดีขึ้น/แย่ลง..."></textarea></div>
+      <div class="col-6"><label>ความรุนแรงของอาการ (0-10)</label><input id="f_pain" type="number" min="0" max="10"></div><div class="col-6"><label>อาการร่วม</label><input id="f_associated"></div>
+    </div></div>
+    <div class="panel"><h3>ประวัติแพ้ยา / แพ้อาหาร</h3><div class="grid">
+      <div class="col-6"><label>มีประวัติแพ้หรือไม่</label><select id="f_allergy"><option>ไม่ทราบ</option><option>ไม่มี</option><option>มี</option></select></div>
+      <div class="col-6"><label>ชื่อยา/อาหารที่แพ้</label><input id="f_allergyDetail" placeholder="พิมพ์ชื่อยา/อาหาร"></div>
+      <div class="col-12"><label>ลักษณะอาการแพ้</label><textarea id="f_allergyReaction" placeholder="เช่น ผื่น คัน บวม หายใจลำบาก"></textarea></div>
+    </div></div>
+  </div>
+
+  <div class="historyStep" id="hs3" style="display:none">
+    <div class="panel"><h3>โรคประจำตัวและประวัติการรักษา</h3><div class="grid">
+      <div class="col-12"><label>โรคประจำตัว <span class="req">*</span> — ต้องพิมพ์ชื่อโรค</label><div class="tagInput"><input id="diseaseInput" placeholder="เช่น เบาหวานชนิดที่ 2"><button class="btn" onclick="addTag('diseaseInput','diseases')">＋ เพิ่ม</button></div><div class="tags" id="diseases"></div></div>
+      <div class="col-12"><label>ยาที่ใช้อยู่เป็นประจำ</label><div class="tagInput"><input id="medInput" placeholder="ชื่อยา / ขนาดยา / วิธีใช้"><button class="btn" onclick="addTag('medInput','meds')">＋ เพิ่ม</button></div><div class="tags" id="meds"></div></div>
+      <div class="col-6"><label>เคยผ่าตัดหรือไม่</label><select id="f_surgery"><option>ไม่เคย</option><option>เคย</option><option>ไม่ทราบ</option></select></div><div class="col-6"><label>รายละเอียดการผ่าตัด</label><input id="f_surgeryDetail"></div>
+      <div class="col-6"><label>เคยนอนโรงพยาบาลหรือไม่</label><select id="f_admit"><option>ไม่เคย</option><option>เคย</option><option>ไม่ทราบ</option></select></div><div class="col-6"><label>รายละเอียด</label><input id="f_admitDetail"></div>
+      <div class="col-12"><label>ประวัติครอบครัว</label><textarea id="f_family" placeholder="โรคสำคัญในบิดา มารดา พี่น้อง..."></textarea></div>
+    </div></div>
+  </div>
+
+  <div class="historyStep" id="hs4" style="display:none">
+    <div class="panel"><h3>พฤติกรรมและปัจจัยเสี่ยง</h3><div class="grid">
+      <div class="col-4"><label>สูบบุหรี่</label><select id="f_smoke"><option>ไม่สูบ</option><option>เคยสูบ</option><option>สูบปัจจุบัน</option></select></div><div class="col-4"><label>ดื่มแอลกอฮอล์</label><select id="f_alcohol"><option>ไม่ดื่ม</option><option>ดื่มเป็นครั้งคราว</option><option>ดื่มเป็นประจำ</option></select></div><div class="col-4"><label>การออกกำลังกาย</label><select id="f_exercise"><option>ไม่ค่อยออกกำลังกาย</option><option>1-2 วัน/สัปดาห์</option><option>3-5 วัน/สัปดาห์</option><option>เกือบทุกวัน</option></select></div>
+      <div class="col-6"><label>อาหารที่รับประทานเป็นประจำ</label><textarea id="f_diet"></textarea></div><div class="col-6"><label>การนอนหลับ</label><textarea id="f_sleep"></textarea></div>
+      <div class="col-12"><label>ปัจจัยเสี่ยง / การสัมผัสโรค / การเดินทาง</label><textarea id="f_risk"></textarea></div>
+    </div></div>
+  </div>
+
+  <div class="historyStep" id="hs5" style="display:none">
+    <div class="panel"><h3>ทบทวนอาการตามระบบ (Review of Systems)</h3><div class="grid">
+      <div class="col-4"><label>ทั่วไป</label><textarea id="ros_general" placeholder="ไข้ หนาวสั่น น้ำหนักเปลี่ยน..."></textarea></div><div class="col-4"><label>หัวใจและหลอดเลือด</label><textarea id="ros_cv" placeholder="เจ็บหน้าอก ใจสั่น บวม..."></textarea></div><div class="col-4"><label>ระบบหายใจ</label><textarea id="ros_resp" placeholder="ไอ หอบ เหนื่อย..."></textarea></div>
+      <div class="col-4"><label>ทางเดินอาหาร</label><textarea id="ros_gi"></textarea></div><div class="col-4"><label>ระบบประสาท</label><textarea id="ros_neuro"></textarea></div><div class="col-4"><label>ผิวหนัง</label><textarea id="ros_skin"></textarea></div>
+      <div class="col-12"><label>ข้อมูลเพิ่มเติม</label><textarea id="f_extra"></textarea></div>
+    </div></div>
+  </div>
+  <div class="actions noPrint" style="justify-content:space-between"><button class="btn" onclick="historyPrev()">← ก่อนหน้า</button><div><button class="btn" onclick="historyNext()">ถัดไป →</button><button class="btn green" onclick="saveAll()">บันทึก</button></div></div>
+</section>
+
+<section class="page" id="exam">
+  <div class="title"><div><h1>ตรวจร่างกาย</h1><p>บันทึกค่าพื้นฐานและผลตรวจตามระบบ</p></div><button class="btn green" onclick="saveAll()">บันทึก</button></div>
+  <div class="panel patientHero" id="examHero"></div>
+  <div class="panel"><h3>สัญญาณชีพ</h3><div class="grid">
+    <div class="col-3"><label>อุณหภูมิ (°C)</label><input id="v_temp" type="number" step=".1"></div><div class="col-3"><label>ชีพจร (ครั้ง/นาที)</label><input id="v_pulse" type="number"></div><div class="col-3"><label>หายใจ (ครั้ง/นาที)</label><input id="v_resp" type="number"></div><div class="col-3"><label>SpO₂ (%)</label><input id="v_spo2" type="number"></div>
+    <div class="col-3"><label>ความดันตัวบน</label><input id="v_sys" type="number"></div><div class="col-3"><label>ความดันตัวล่าง</label><input id="v_dia" type="number"></div><div class="col-3"><label>น้ำหนัก (kg)</label><input id="v_weight" type="number" step=".1"></div><div class="col-3"><label>ส่วนสูง (cm)</label><input id="v_height" type="number" step=".1"></div>
+  </div></div>
+  <div class="panel"><h3>ตรวจร่างกาย</h3><div class="grid">
+    <div class="col-6"><label>ลักษณะทั่วไป</label><textarea id="e_general"></textarea></div><div class="col-6"><label>ศีรษะ / คอ / ตา / หู</label><textarea id="e_heent"></textarea></div>
+    <div class="col-6"><label>หัวใจ</label><textarea id="e_heart"></textarea></div><div class="col-6"><label>ปอด</label><textarea id="e_lung"></textarea></div>
+    <div class="col-6"><label>ช่องท้อง</label><textarea id="e_abd"></textarea></div><div class="col-6"><label>ระบบประสาท</label><textarea id="e_neuro"></textarea></div>
+    <div class="col-6"><label>ผิวหนัง / แขนขา</label><textarea id="e_skin"></textarea></div><div class="col-6"><label>ผลตรวจอื่น ๆ</label><textarea id="e_other"></textarea></div>
+  </div></div>
+</section>
+
+<section class="page" id="assessment">
+  <div class="title"><div><h1>ประเมินเบื้องต้น</h1><p>ส่วนสำหรับบันทึกการประเมินและแผนการดูแล</p></div><button class="btn green" onclick="saveAll()">บันทึก</button></div>
+  <div class="panel patientHero" id="assessHero"></div>
+  <div class="alert danger">พื้นที่นี้เป็นแบบฟอร์มจำลอง ไม่ได้วินิจฉัยโรคและไม่ควรใช้แทนคำแนะนำจากบุคลากรทางการแพทย์</div>
+  <div class="panel"><h3>การประเมิน</h3><div class="grid">
+    <div class="col-12"><label>ปัญหาสำคัญ / Assessment</label><textarea id="a_problem"></textarea></div>
+    <div class="col-12"><label>การวินิจฉัยเบื้องต้นที่ผู้กรอกต้องการบันทึก</label><div class="tagInput"><input id="dxInput" placeholder="พิมพ์ชื่อโรคหรือภาวะ เช่น ไข้หวัด"><button class="btn" onclick="addTag('dxInput','diagnoses')">＋ เพิ่ม</button></div><div class="tags" id="diagnoses"></div></div>
+    <div class="col-6"><label>ระดับความเร่งด่วน</label><select id="a_triage"><option>ไม่เร่งด่วน</option><option>ควรได้รับการประเมิน</option><option>เร่งด่วน</option><option>ฉุกเฉิน</option></select></div>
+    <div class="col-6"><label>ผู้บันทึก</label><input id="a_by"></div>
+    <div class="col-12"><label>แผนการดูแล / หมายเหตุ</label><textarea id="a_plan"></textarea></div>
+  </div></div>
+</section>
+
+<section class="page" id="summary">
+  <div class="title"><div><h1>สรุปเวชระเบียน</h1><p>ตรวจสอบข้อมูลก่อนพิมพ์</p></div><div class="actions"><button class="btn" onclick="saveAll()">💾 บันทึก</button><button class="btn primary" onclick="window.print()">🖨 พิมพ์</button></div></div>
+  <div class="panel patientHero" id="summaryHero"></div>
+  <div id="summaryContent"></div>
+</section>
+
+<section class="page" id="settings">
+  <div class="title"><div><h1>ตั้งค่าและข้อมูลเครื่อง</h1><p>จัดการข้อมูลที่บันทึกไว้ในเบราว์เซอร์</p></div></div>
+  <div class="panel"><h3>สถานะพื้นที่จัดเก็บ</h3><p class="muted">ระบบใช้ LocalStorage ของเบราว์เซอร์ ไม่มีฐานข้อมูลภายนอก</p><div class="actions"><button class="btn" onclick="exportData()">ส่งออกข้อมูล JSON</button><label class="btn" style="display:inline-block">นำเข้า JSON <input type="file" accept=".json" style="display:none" onchange="importData(event)"></label><button class="btn red" onclick="clearAll()">ล้างข้อมูลทั้งหมด</button></div></div>
+  <div class="panel"><h3>ข้อจำกัดสำคัญ</h3><ul class="muted"><li>ข้อมูลผูกกับเบราว์เซอร์และเครื่องที่ใช้งาน</li><li>ล้าง Site Data / LocalStorage แล้วข้อมูลจะหาย</li><li>โหมดไม่ระบุตัวตน (Incognito) ไม่เหมาะกับการเก็บข้อมูลต่อเนื่อง</li><li>ไม่ควรใส่ข้อมูลผู้ป่วยจริงลงในเว็บเดโมนี้</li></ul></div>
+</section>
+
+</main></div>
+
+<div class="modal" id="patientModal">
+ <div class="modalbox"><div class="modalhead"><h3>เลือกผู้ป่วย</h3><button class="x" onclick="closeModal()">×</button></div><div class="search" style="margin:12px 0"><span>🔎</span><input id="modalSearch" placeholder="ค้นหา..." oninput="renderModalPatients()"></div><div id="modalPatients"></div></div>
+</div>
+
+<script>
+const KEY="hoscare_single_file_v1";
+let db={patients:[],currentId:null};
+let hstep=1;
+
+const fields=[
+'f_hn','f_title','f_name','f_cid','f_dob','f_age','f_gender','f_blood','f_phone','f_job','f_emergency','f_address',
+'f_cc','f_duration','f_hpi','f_pain','f_associated','f_allergy','f_allergyDetail','f_allergyReaction','f_surgery','f_surgeryDetail','f_admit','f_admitDetail','f_family',
+'f_smoke','f_alcohol','f_exercise','f_diet','f_sleep','f_risk','ros_general','ros_cv','ros_resp','ros_gi','ros_neuro','ros_skin','f_extra',
+'v_temp','v_pulse','v_resp','v_spo2','v_sys','v_dia','v_weight','v_height','e_general','e_heent','e_heart','e_lung','e_abd','e_neuro','e_skin','e_other',
+'a_problem','a_triage','a_by','a_plan'
+];
+
+function $(id){return document.getElementById(id)}
+function load(){try{let x=localStorage.getItem(KEY);if(x)db=JSON.parse(x)}catch(e){} if(!db.patients)db.patients=[]; updateMetrics(); renderPatients(); renderRecent(); if(db.currentId)loadPatient(db.currentId); else updateHeroes(); }
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));$("saveState").textContent="● บันทึกล่าสุด "+new Date().toLocaleTimeString("th-TH");updateMetrics()}
+function doLogin(){let u=$("loginUser").value,p=$("loginPass").value;if((u==="staff"||u==="demo")&&p==="1234"){$("login").style.display="none";sessionStorage.hoslogin="1"}else alert("รหัสผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง")}
+function logout(){$("login").style.display="flex"}
+if(sessionStorage.hoslogin==="1")$("login").style.display="none";
+setInterval(()=>{$("clock").textContent=new Date().toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"medium"})},1000);
+
+document.querySelectorAll(".nav[data-page]").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));if(id==="summary")renderSummary();if(id==="patients")renderPatients();if(id==="dashboard"){renderRecent();updateMetrics()}}
+function newPatient(){
+ let p={id:Date.now().toString(),hn:"HN"+String(db.patients.length+1).padStart(6,"0"),created:Date.now(),updated:Date.now(),diseases:[],meds:[],diagnoses:[]};
+ db.patients.unshift(p);db.currentId=p.id;persist();loadPatient(p.id);showPage("history");setHStep(1);
+}
+function selectPatient(){renderModalPatients();$("patientModal").classList.add("show")}
+function closeModal(){$("patientModal").classList.remove("show")}
+function renderModalPatients(){let q=($("modalSearch").value||"").toLowerCase();$("modalPatients").innerHTML=db.patients.filter(p=>(p.name||"").toLowerCase().includes(q)||(p.hn||"").toLowerCase().includes(q)).map(p=>`<button class="btn" style="width:100%;text-align:left;margin:4px 0" onclick="choosePatient('${p.id}')"><b>${p.hn}</b> — ${esc(p.name||"ยังไม่ได้ระบุชื่อ")} <span class="muted">${p.age||"-"} ปี</span></button>`).join("")||'<div class="muted">ไม่พบผู้ป่วย</div>'}
+function choosePatient(id){closeModal();loadPatient(id);showPage("history")}
+function getCurrent(){return db.patients.find(p=>p.id===db.currentId)}
+function loadPatient(id){
+ db.currentId=id;let p=getCurrent();if(!p)return;
+ fields.forEach(k=>{if($(k))$(k).value=p[k]??""});
+ renderTags("diseases",p.diseases||[]);renderTags("meds",p.meds||[]);renderTags("diagnoses",p.diagnoses||[]);
+ updateHeroes();persist();
+}
+function saveAll(silent=false){
+ let p=getCurrent();if(!p){alert("กรุณาสร้างหรือเลือกผู้ป่วยก่อน");return}
+ fields.forEach(k=>{if($(k))p[k]=$(k).value});
+ p.diseases=getTags("diseases");p.meds=getTags("meds");p.diagnoses=getTags("diagnoses");p.updated=Date.now();
+ persist();renderPatients();renderRecent();renderSummary();updateHeroes();
+ if(!silent)toast("บันทึกข้อมูลเรียบร้อย");
+}
+function calcAge(){let d=$("f_dob").value;if(d){let a=new Date().getFullYear()-new Date(d).getFullYear();$("f_age").value=a}}
+function addTag(inputId,containerId){let inp=$(inputId),v=inp.value.trim();if(!v)return;let p=getCurrent();if(!p)return alert("กรุณาเลือกผู้ป่วยก่อน");p[containerId]=p[containerId]||[];if(!p[containerId].includes(v))p[containerId].push(v);inp.value="";renderTags(containerId,p[containerId]);persist()}
+function renderTags(id,arr){$(id).innerHTML=(arr||[]).map((x,i)=>`<span class="tag">${esc(x)} <button onclick="removeTag('${id}',${i})">×</button></span>`).join("")}
+function removeTag(id,i){let p=getCurrent();p[id].splice(i,1);renderTags(id,p[id]);persist()}
+function getTags(id){return [...$(id).querySelectorAll(".tag")].map(x=>x.childNodes[0].textContent.trim())}
+function setHStep(n){hstep=Math.max(1,Math.min(5,n));document.querySelectorAll(".historyStep").forEach((x,i)=>x.style.display=i===hstep-1?"block":"none");document.querySelectorAll(".step").forEach((x,i)=>{x.classList.toggle("active",i===hstep-1);x.classList.toggle("done",i<hstep-1)})}
+function historyNext(){saveAll(true);if(hstep<5)setHStep(hstep+1);else showPage("exam")}
+function historyPrev(){if(hstep>1)setHStep(hstep-1);else showPage("patients")}
+document.querySelectorAll(".step").forEach((x,i)=>x.onclick=()=>setHStep(i+1));
+
+function heroHTML(p){return `<div class="avatar">${esc((p.name||"?").trim().charAt(0))}</div><div class="patientMeta"><h2>${esc(p.name||"ยังไม่ได้ระบุชื่อ")}</h2><div class="chips"><span class="chip">${p.hn}</span><span class="chip">${esc(p.gender||"-")}</span><span class="chip">${p.age||"-"} ปี</span><span class="chip">กรุ๊ปเลือด ${esc(p.blood||"-")}</span></div></div>`}
+function updateHeroes(){let p=getCurrent();["currentHero","examHero","assessHero","summaryHero"].forEach(id=>$(id).innerHTML=p?heroHTML(p):'<div class="muted">ยังไม่ได้เลือกผู้ป่วย</div>')}
+function renderPatients(){let q=($("patientSearch")?.value||"").toLowerCase(),filter=$("patientFilter")?.value||"all";let arr=db.patients.filter(p=>{let ok=(p.name||"").toLowerCase().includes(q)||(p.hn||"").toLowerCase().includes(q)||(p.cid||"").includes(q);if(filter==="today")ok=ok&&new Date(p.created).toDateString()===new Date().toDateString();return ok});$("patientTable").innerHTML=arr.map(p=>`<tr><td><b>${p.hn}</b></td><td>${esc(p.title||"")} ${esc(p.name||"ยังไม่ได้ระบุ")}</td><td>${esc(p.gender||"-")}</td><td>${p.age||"-"}</td><td>${(p.diseases||[]).map(esc).join(", ")||"—"}</td><td>${new Date(p.updated).toLocaleString("th-TH")}</td><td><button class="btn" onclick="choosePatient('${p.id}')">เปิด</button></td></tr>`).join("")||'<tr><td colspan="7" class="muted">ยังไม่มีข้อมูล</td></tr>'}
+function renderRecent(){let arr=db.patients.slice(0,6);$("recent").innerHTML=arr.map(p=>`<tr><td><b>${p.hn}</b></td><td>${esc(p.name||"ยังไม่ได้ระบุ")}</td><td>${p.age||"-"}</td><td>${esc(p.cc||"—")}</td><td><span class="status">บันทึกแล้ว</span></td><td><button class="btn" onclick="choosePatient('${p.id}')">เปิด</button></td></tr>`).join("")||'<tr><td colspan="6" class="muted">ยังไม่มีผู้ป่วย</td></tr>'}
+function updateMetrics(){$("mPatients").textContent=db.patients.length;$("mToday").textContent=db.patients.filter(p=>new Date(p.updated).toDateString()===new Date().toDateString()).length;$("mHistory").textContent=db.patients.filter(p=>p.cc||p.hpi).length}
+function renderSummary(){let p=getCurrent();if(!p){$("summaryContent").innerHTML='<div class="panel muted">ยังไม่มีผู้ป่วย</div>';return}$("summaryContent").innerHTML=`
+<div class="panel"><h3>ข้อมูลทั่วไป</h3><div class="grid">${item("HN",p.hn)}${item("ชื่อ",`${p.title||""} ${p.name||"-"}`)}${item("เลขบัตร",p.cid||"-")}${item("วันเกิด",p.dob||"-")}${item("อายุ",p.age?p.age+" ปี":"-")}${item("เพศ",p.gender||"-")}${item("กรุ๊ปเลือด",p.blood||"-")}${item("โทรศัพท์",p.phone||"-")}</div></div>
+<div class="panel"><h3>อาการสำคัญและประวัติปัจจุบัน</h3><p><b>Chief Complaint:</b> ${esc(p.cc||"-")} ${esc(p.duration||"")}</p><p><b>HPI:</b><br>${nl(p.hpi||"-")}</p><p><b>อาการร่วม:</b> ${esc(p.associated||"-")}</p></div>
+<div class="panel"><h3>ประวัติเดิม</h3><p><b>โรคประจำตัว:</b> ${(p.diseases||[]).map(esc).join(", ")||"ไม่มีข้อมูล"}</p><p><b>ยาประจำ:</b> ${(p.meds||[]).map(esc).join(", ")||"ไม่มีข้อมูล"}</p><p><b>แพ้ยา/อาหาร:</b> ${esc(p.allergy||"-")} ${esc(p.allergyDetail||"")}</p><p><b>ประวัติครอบครัว:</b><br>${nl(p.family||"-")}</p></div>
+<div class="panel"><h3>สัญญาณชีพและตรวจร่างกาย</h3><div class="grid">${item("อุณหภูมิ",p.v_temp?p.v_temp+" °C":"-")}${item("ชีพจร",p.v_pulse?p.v_pulse+" ครั้ง/นาที":"-")}${item("หายใจ",p.v_resp?p.v_resp+" ครั้ง/นาที":"-")}${item("SpO₂",p.v_spo2?p.v_spo2+" %":"-")}${item("ความดัน",p.v_sys&&p.v_dia?p.v_sys+"/"+p.v_dia:"-")}${item("น้ำหนัก",p.v_weight?p.v_weight+" kg":"-")}</div><hr><p><b>ลักษณะทั่วไป:</b><br>${nl(p.e_general||"-")}</p><p><b>หัวใจ:</b><br>${nl(p.e_heart||"-")}</p><p><b>ปอด:</b><br>${nl(p.e_lung||"-")}</p><p><b>ช่องท้อง:</b><br>${nl(p.e_abd||"-")}</p></div>
+<div class="panel"><h3>การประเมิน</h3><p><b>ปัญหา:</b><br>${nl(p.a_problem||"-")}</p><p><b>รายการที่บันทึก:</b> ${(p.diagnoses||[]).map(esc).join(", ")||"-"}</p><p><b>ความเร่งด่วน:</b> ${esc(p.a_triage||"-")}</p><p><b>แผน:</b><br>${nl(p.a_plan||"-")}</p></div>
+<div class="printOnly"><small>เอกสารจาก HOS-CARE Demo • ${new Date().toLocaleString("th-TH")}</small></div>`}
+function item(a,b){return `<div class="col-3"><div class="muted">${a}</div><b>${esc(String(b))}</b></div>`}
+function nl(s){return esc(String(s)).replace(/\n/g,"<br>")}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(msg){let x=document.createElement("div");x.textContent=msg;x.style.cssText="position:fixed;right:20px;bottom:20px;background:#173452;color:#fff;padding:12px 16px;border-radius:10px;z-index:100;box-shadow:0 10px 30px #0003";document.body.appendChild(x);setTimeout(()=>x.remove(),2200)}
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="hos-care-backup.json";a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.patients)throw 0;db=x;persist();if(db.currentId)loadPatient(db.currentId);renderPatients();renderRecent();alert("นำเข้าข้อมูลสำเร็จ")}catch{alert("ไฟล์ไม่ถูกต้อง")}};r.readAsText(f)}
+function clearAll(){if(confirm("ยืนยันล้างข้อมูลผู้ป่วยทั้งหมดจากเบราว์เซอร์? การดำเนินการนี้ย้อนกลับไม่ได้")){localStorage.removeItem(KEY);db={patients:[],currentId:null};renderPatients();renderRecent();updateHeroes();updateMetrics();toast("ล้างข้อมูลแล้ว")}}
+window.addEventListener("beforeunload",()=>{try{saveAll(true)}catch(e){}});load();
+</script>
+</body>
+</html>
